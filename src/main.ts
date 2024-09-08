@@ -1,25 +1,25 @@
-import { addAjaxListener, AjaxData, Swap } from "./dom/ajax"
-import { AttributeManager, AttributeAction } from "./dom/attributes"
-import { HttpMethod } from "./http/general"
-import { getEnumKeyByEnumValue } from "./utils/enums"
+import { getAjaxAttributeActions } from "./dom/ajax";
+import { AttributeAction, AttributeManager } from "./dom/attributes";
 
-window.onload = () => initTask(document.documentElement)
+const factories: ((e: Element) => AttributeAction[])[] = [
+    getAjaxAttributeActions,
+];
 
-function initTask(element: Element): void
-{
-    const children = element.children
+window.onload = () => initTask(document.documentElement);
 
-    for(const child of children)
-    {
-        const ajaxData = initAjaxData(child)
-        const httpContainer = initHttpContainer(ajaxData)
-        const manager = new AttributeManager(httpContainer.actions)
+function initTask(element: Element): void {
+    const children = element.children;
 
-        for(const attribute of child.attributes)
-        {
-            manager.doAttribute(attribute)
+    for (const child of children) {
+        const actions = factories.reduce<AttributeAction[]>(
+            (prev, cur) => [...prev, ...cur(child)],
+            [],
+        );
+        const manager = new AttributeManager(actions);
+
+        for (const attribute of child.attributes) {
+            manager.doAttribute(attribute);
         }
-        if(httpContainer.executed) addAjaxListener(child, ajaxData)
-        initTask(child)
+        initTask(child);
     }
 }
