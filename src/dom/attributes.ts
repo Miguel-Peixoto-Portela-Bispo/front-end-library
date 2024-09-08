@@ -1,15 +1,14 @@
 export interface AttributeAction
 {
-    name: string;
+    name: string
     act: (value: string) => void
 }
 export class AttributeManager
 {
-
     constructor(
         private readonly list: AttributeAction[] = []
     ){}
-    doAttribute(attribute: Attr)
+    doAttribute(attribute: Attr): void
     {
         this.list.forEach(a =>
         {
@@ -18,7 +17,7 @@ export class AttributeManager
              a.act(attribute.value)
         })
     }
-    addAtrributeAction(...attributeActions: AttributeAction[])
+    addAtrributeAction(...attributeActions: AttributeAction[]): void
     {
         this.list.push(...attributeActions)
     }
