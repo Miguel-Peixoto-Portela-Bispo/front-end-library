@@ -5,7 +5,15 @@ const factories: ((e: Element) => AttributeAction[])[] = [
     getAjaxAttributeActions,
 ];
 
-window.onload = () => initTask(document.documentElement);
+window.onload = () => {
+    console.time()
+    // for(let i = 0;i < 65;i++)
+    // {
+    //     console.log("test")
+    // }
+    initTask(document.documentElement);
+    console.timeEnd()
+};
 
 function initTask(element: Element): void {
     const children = element.children;

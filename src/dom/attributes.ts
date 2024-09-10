@@ -1,6 +1,6 @@
 export interface AttributeAction {
     name: string;
-    act: (value: string) => void;
+    act: (value: Attr) => void;
 }
 export class AttributeManager {
     constructor(private readonly list: AttributeAction[] = []) {}
@@ -8,7 +8,7 @@ export class AttributeManager {
         this.list.forEach((a) => {
             if (a.name != attribute.name) return;
 
-            a.act(attribute.value);
+            a.act(attribute);
         });
     }
     addAtrributeAction(...attributeActions: AttributeAction[]): void {

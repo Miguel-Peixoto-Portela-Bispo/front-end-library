@@ -14,19 +14,11 @@ interface AjaxData {
     target: Element;
     swap: Swap;
 }
-interface HttpContainer {
-    actions: AttributeAction[];
-    executed: boolean;
-}
-
-let httpContainer: HttpContainer | null = null;
 
 export function getAjaxAttributeActions(element: Element): AttributeAction[] {
     const ajaxData = initAjaxData(element);
 
-    httpContainer = initHttpContainer(ajaxData);
-    addAjaxListener(element, ajaxData);
-    return httpContainer.actions;
+    return getActions(ajaxData);
 }
 function initAjaxData(element: Element): AjaxData {
     return {
@@ -36,18 +28,17 @@ function initAjaxData(element: Element): AjaxData {
         request: {},
     };
 }
-function initHttpContainer(data: AjaxData): HttpContainer {
-    const result: HttpContainer = { actions: [], executed: false };
+function getActions(data: AjaxData): AttributeAction[] {
     const prefix = "http:";
-    const setMethod = (url: string, method: HttpMethod) => {
+    const setMethod = (attr: Attr, method: HttpMethod) => {
         if (data.request) {
-            data.request.url = url;
+            data.request.url = attr.value;
             data.request.method = method;
         }
-        result.executed = true;
+        if (attr.ownerElement) addAjaxListener(attr.ownerElement, data);
     };
 
-    result.actions = [
+    return [
         {
             name: prefix + "get",
             act: (arg) => setMethod(arg, HttpMethod.GET),
@@ -70,17 +61,17 @@ function initHttpContainer(data: AjaxData): HttpContainer {
         },
         {
             name: prefix + "trigger",
-            act: (arg) => (data.trigger = new Event(arg)),
+            act: (arg) => (data.trigger = new Event(arg.value)),
         },
         {
             name: prefix + "target",
             act: (arg) =>
-                (data.target = document.querySelector(arg) || data.target),
+                (data.target = document.querySelector(arg.value) || data.target),
         },
         {
             name: prefix + "swap",
             act: (arg) => {
-                const key = getEnumKeyByEnumValue(Swap, arg);
+                const key = getEnumKeyByEnumValue(Swap, arg.value);
                 const newSwap = key ? Swap[key] : data.swap;
 
                 return (data.swap = newSwap);
@@ -89,7 +80,7 @@ function initHttpContainer(data: AjaxData): HttpContainer {
         {
             name: prefix + "headers",
             act: (arg) => {
-                const json = JSON.parse(arg);
+                const json = JSON.parse(arg.value);
 
                 Object.entries(json).forEach((entry) =>
                     data.request.headers?.append(entry[0], entry[1] as string),
@@ -98,10 +89,9 @@ function initHttpContainer(data: AjaxData): HttpContainer {
         },
         {
             name: "value",
-            act: (arg) => (data.request.body = arg),
+            act: (arg) => (data.request.body = arg.value),
         },
     ];
-    return result;
 }
 export function addAjaxListener(element: Element, data: AjaxData): void {
     if (!data.trigger) return;
