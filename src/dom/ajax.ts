@@ -66,8 +66,8 @@ function getActions(data: AjaxData): AttributeAction[] {
         {
             name: prefix + "target",
             act: (arg) =>
-            (data.target =
-                document.querySelector(arg.value) || data.target),
+                (data.target =
+                    document.querySelector(arg.value) || data.target),
         },
         {
             name: prefix + "swap",

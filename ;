@@ -14,8 +14,8 @@ export function replaceElement(
     const htmlOriginal = original && (original as HTMLElement);
     const originalStyle = htmlOriginal.style.cssText;
 
+    newElements.forEach((cur) => initTask(cur))
     original.replaceWith(...newElements);
-    newElements.forEach((cur) => initTask(cur));
     if (visibleElements.length != 1 && !smooth) return;
     resetStyleFrom(originalStyle, firstVisible);
 }

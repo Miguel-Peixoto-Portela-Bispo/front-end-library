@@ -7,19 +7,20 @@ const factories: ((e: Element) => AttributeAction[])[] = [
 
 window.onload = () => initTask(document.documentElement);
 
-function initTask(element: Element): void {
-    const children = element.children;
-
-    for (const child of children) {
-        const actions = factories.reduce<AttributeAction[]>(
-            (prev, cur) => [...prev, ...cur(child)],
-            [],
-        );
-        const manager = new AttributeManager(actions);
-
-        for (const attribute of child.attributes) {
-            manager.doAttribute(attribute);
-        }
+export function initTask(element: Element): void {
+    doWork(element);
+    for (const child of element.children) {
         initTask(child);
+    }
+}
+function doWork(element: Element) {
+    const actions = factories.reduce<AttributeAction[]>(
+        (prev, cur) => [...prev, ...cur(element)],
+        [],
+    );
+    const manager = new AttributeManager(actions);
+
+    for (const attribute of element.attributes) {
+        manager.doAttribute(attribute);
     }
 }
